@@ -1,1 +1,1 @@
-# python-others
+# django-others
