@@ -1,0 +1,183 @@
+DELIVERABLE MIDTERM:
+1. HTML, CSS and JS
+
+
+1st Task: 
+2. setup the back end 
+3. list data for the database
+
+
+NOTE:
+1. have to setup your static and media files as well - I'd suggest using Amazon S3.
+
+TO CONSIDER:
+1. mobile responsiveness
+2. accessibility 
+
+WEBPAGES TO DEVELOP:
+
+Other interface:
+Erika 1. login page
+Erika 2. register page 
+
+Student's interface
+haber 1. home page (all courses, nav bar of to do; calendar; and add class)
+kensh 2. Calendar page
+raiz 3. to do page
+shaina 4. individual (nav bar: courses page, classwork & people)
+eunice 5. submission page
+
+Instructor's interface 
+1. Index page - individual course page
+2. Classwork page - (create toggle, form for materials )
+3. People page 
+4. Marks page (to explore)
+
+Meeting agenda:
+1. verify the assign web pages 
+2. scope of various web pages, ano ano yung mga functionalities ang iinclude and their respective data 
+3. sino sino magbaback-end
+
+
+==================================================================================================================
+CREATING DJANGO PROJECT
+1. python -m venv venv
+2. source venv/bin/activate 
+3. pip install django
+4. pip install psycopg2 (for postgres)
+5. django-admin startproject <name of proj>
+6. python manage.py startapp <name of app>
+
+UTILIZING THE NEW APP IN DJANGO
+1. settings.py -> INSTALLED APP 
+2. urls.py -> "include"
+
+DEPLOY DJANGO:
+1. settings.py -> 'ALLOWED_HOST' -> .vercel.app
+2. pip freeze > requirements.txt , change psycopg2 into psycopg2-binary~=2.9.3
+3. vercel.json in project directory 
+
+{
+    "builds": [{
+        "src": "djangoprojectname/wsgi.py",
+        "use": "@vercel/python",
+        "config": { "maxLambdaSize": "15mb", "runtime": "python3.9" }
+    }],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "djangoprojectname/wsgi.py"
+        }
+    ]
+}
+
+4. wsgi.py -> app = application
+5. create repo then push to repo 
+6. import to vercel, then deploy
+
+RAILWAY POSTGRESQL TO DJANGO:
+1. pip install psycopg2 
+2. modify settings.py -> DATABASES
+3. python manage.py makemigrations -> python manage.py migrate 
+
+GOOGLE ACCOUNT: https://www.codesnail.com/google-authentication-in-django/
+1. pip install django-allauth
+2. settings.py -> 'INSTALLED_APPS'
+
+INSTALLED_APPS = [
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+
+    'django.contrib.sites', # must
+    'allauth', # must
+    'allauth.account', # must
+    'allauth.socialaccount', # must
+    'allauth.socialaccount.providers.google', # new
+]
+
+3. settings.py -> last part 
+
+# core/settings.py
+
+SITE_ID = 1
+
+AUTHENTICATION_BACKENDS = [
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+
+    # `allauth` specific authentication methods, such as login by e-mail
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+
+LOGIN_REDIRECT_URL = '/'
+
+4. urls.py (main app) -> path('accounts/', include('allauth.urls')),
+5. setup google api  https://console.cloud.google.com/apis/ -> create project 
+6. go to oauth consent screen 
+7. go to credentials -> create credentials
+8. copy paste the client ID and client secret 
+9. python manage.py migrate 
+10. python manage.py createsuperuser
+11. go to admin page
+
+Sites -> Domain name: 127.0.0.1:8000
+Social Application -> Provider: google -> Name: google auth
+
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': '<PGDATABASE>',
+        'USER': '<PGUSER>',
+        'PASSWORD': '<PGPASSWORD>',
+        'HOST': '<PGHOST>',
+        'PORT': '<PGPORT>',
+    }
+}
+
+CREATE DATABASE IN LOCAL POSTGRESQL:
+1. sudo -u postgres psql
+2. CREATE DATABASE trial1
+3. CREATE USER trialuser1 WITH PASSWORD 'pass';
+4. ALTER ROLE trialuser1 SET client_encoding TO 'utf-8';
+5. ALTER ROLE trialuser1 SET timezone TO 'UTC';
+6. ALTER ROLE trialuser1 SET default_transaction_isolation TO 'read committed';
+7. GRANT ALL PRIVILEGES ON DATABASE trial1 TO trialuser1;
+8. \q
+9. python manage.py makemigrations > python manage.py migrate
+
+CONFIG settings.py:
+1. DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'trial1',
+        'USER': 'trialuser1',
+        'PASSWORD': 'pass',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
+}
+
+2. ALLOWED_HOSTS = ['127.0.0.1']
+
+
+NOTE: to secure the variables utilize .env
+-> pip install dotenv
+-> create .env file, input the necessary variables (e.g. PGDATABASE, PGUSER, PGPASSWORD, PGHOST, PGPORT)
+-> in settings.py state "os.getenv("PGDATABASE")" and etc
+
+OTHERS:
+1. service postgresql restart
+>> to restart postgresql database when settings are configure
+
+2. psql -d trial1 -U trialuser1
+>> go to database trial1 with owner trialuser1
+
+3. \dt 
+>> describe table in postgresql
